@@ -63,8 +63,7 @@ keyword.addEventListener('keyup', (event) => {
 
             })
 
-})
-        
+})     
         
     })
     .catch((e) => {
