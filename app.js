@@ -1,6 +1,10 @@
 
 const keyword = document.querySelector('#keyword');
-const villes = document.querySelector('#villes');
+const villes  = document.querySelector('#villes');
+
+var mymap  = L.map('mapid').setView([51.505, -0.09], 13);
+var marker = L.marker([51.5, -0.09]).addTo(mymap);
+
 //console.log(villes);
 
 
@@ -20,6 +24,7 @@ keyword.addEventListener('keyup', (event) => {
         //console.log(data.hits);
         const cityList = data.hits;
         const displayedCity = [];
+        var displedName = "";
 
         cityList.forEach(ville => {
             // console.log(ville._geoloc.lat);
@@ -30,7 +35,7 @@ keyword.addEventListener('keyup', (event) => {
             const firstWord = splittedName[0];
             //console.log(firstWord);
 
-            const displedName = firstWord + " (" + ville.country_code + ")";
+            displedName = firstWord + " (" + ville.country_code + ")";
             
             if (!(displayedCity.includes(displedName))) {
                 displayedCity.push(displedName);
@@ -47,16 +52,36 @@ keyword.addEventListener('keyup', (event) => {
             //console.log(option);
 
             keyword.addEventListener('change', (event) => {
-                console.log('click');
-                console.log(keyword.value);
+                //console.log('click');
+                //console.log(keyword.value);
 
                 cityList.forEach(city => {
-                    if (displedName === keyword.value) {
-                        console.log(city);
-                        var res = keyword.value.split();
-                        console.log(res);
-                        //console.log(city._geoloc.lat);
-                        //console.log(city._geoloc.lng);
+                    //console.log(city);
+                    //console.log(keyword.value);
+
+                    var res = keyword.value.split(" ",2);
+                    const firstWord = res[0];
+                    // console.log(firstWord);
+                    // console.log(countryCode);
+
+                    if (city.locale_names.default[0] === firstWord) {
+                        //console.log(city.locale_names.default[0]);
+                        const latitude = city._geoloc.lat;
+                        const longitude = city._geoloc.lng;
+
+                        mymap.remove();
+                        mymap  = L.map('mapid').setView([latitude, longitude], 13);
+                        marker = L.marker([latitude, longitude]).addTo(mymap);
+
+                        L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+                            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+                            maxZoom: 18,
+                            id: 'mapbox/streets-v11',
+                            tileSize: 512,
+                            zoomOffset: -1,
+                            accessToken: 'pk.eyJ1IjoibWFyaWViYSIsImEiOiJja2tuc2RvMmgzNThtMnBxdXg0dWtlNXZmIn0.03wMZswCenHt5EeuNoCpRQ'
+                        }).addTo(mymap); 
+
                     }
                     
                 });
@@ -72,11 +97,7 @@ keyword.addEventListener('keyup', (event) => {
 });
 
 
-
-
 /* MAP */
-var mymap = L.map('mapid').setView([51.505, -0.09], 13);
-var marker = L.marker([51.5, -0.09]).addTo(mymap);
 
 L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
     attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
@@ -85,4 +106,18 @@ L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_toke
     tileSize: 512,
     zoomOffset: -1,
     accessToken: 'pk.eyJ1IjoibWFyaWViYSIsImEiOiJja2tuc2RvMmgzNThtMnBxdXg0dWtlNXZmIn0.03wMZswCenHt5EeuNoCpRQ'
-}).addTo(mymap);
+}).addTo(mymap); 
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Si on veut appeler une fonction dans un addEventListener avec des paramètres à lui passer il faut mettre 'click', (event), parametre => {}
